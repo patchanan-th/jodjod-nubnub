@@ -168,12 +168,12 @@
       <h6 class="mb-3 text-center" style="color: var(--pink-dark);">🌸 เพิ่มรายการใหม่ 🌸</h6>
 
       <div id="quickWrap" class="quick-wrap" style="display:none;">
-        <div class="quick-label">⚡ รายการประจำ (กดเพื่อเติมชื่อและหมวด)</div>
+        <div class="quick-label">⚡ รายการประจำ (กดเพื่อเติมชื่อ)</div>
         <div id="quickChips" class="quick-chips"></div>
       </div>
 
       <div id="favWrap" class="quick-wrap">
-        <div class="quick-label">⭐ รายการโปรด (กดเพื่อเติมชื่อและหมวด)</div>
+        <div class="quick-label">⭐ รายการโปรด (กดเพื่อเติมชื่อ)</div>
         <div id="favChips" class="quick-chips"></div>
       </div>
 
@@ -182,7 +182,6 @@
         <button type="button" class="btn-cat-clear" onclick="clearName()" title="ล้างรายละเอียด">✕</button>
       </div>
       <datalist id="nameList"></datalist>
-      <select id="category" class="form-select" style="display:none;"></select>
       <input type="number" id="amount" class="form-control" placeholder="จำนวนเงิน" inputmode="decimal" onkeydown="handleEnter(event, 'save')">
 
       <button onclick="saveData()" class="btn-pink mb-3" id="saveBtn">บันทึกข้อมูล ✨</button>
@@ -242,10 +241,7 @@
     <div class="card card-custom">
       <h6 class="mb-2" style="color: var(--pink-dark);">🔎 ค้นหาแบบฉลาด / กรอง</h6>
       <input type="text" id="searchBox" class="form-control" placeholder="ค้นหา" oninput="loadHistory()">
-      <div class="small text-muted" style="margin-top:-6px; margin-bottom:10px;">ค้นได้ทั้ง รายละเอียด · หมวดหมู่ · วันที่ · ช่วงจำนวนเงิน (พิมพ์ เช่น <b>100-500</b>)</div>
-      <select id="filterCategory" class="form-select" onchange="loadHistory()">
-        <option value="">-- ทุกหมวดหมู่ --</option>
-      </select>
+      <div class="small text-muted" style="margin-top:-6px; margin-bottom:10px;">ค้นได้ทั้ง รายละเอียด · วันที่ · ช่วงจำนวนเงิน (พิมพ์ เช่น <b>100-500</b>)</div>
       <div class="d-flex gap-2">
         <input type="date" id="filterFrom" class="form-control" onchange="loadHistory()">
         <input type="date" id="filterTo" class="form-control" onchange="loadHistory()">
@@ -261,20 +257,10 @@
   <!-- ========== TAB: ตั้งค่า ========== -->
   <div id="tab-settings" class="tab-page">
     <div class="card card-custom">
-      <h6 class="mb-2" style="color: var(--pink-dark);">🏷️ จัดการหมวดหมู่</h6>
-      <div class="d-flex gap-2">
-        <input type="text" id="newCategoryInput" class="form-control" placeholder="ชื่อหมวดหมู่ใหม่">
-        <button class="btn-pink" style="width:auto; padding:10px 16px;" onclick="addNewCategory()">เพิ่ม</button>
-      </div>
-      <div id="categoryManageList" class="mt-2"></div>
-    </div>
-
-    <div class="card card-custom">
       <h6 class="mb-2" style="color: var(--pink-dark);">⭐ จัดการรายการโปรด</h6>
-      <small class="text-muted d-block mb-2">รายการโปรดจะเติมทั้ง "รายละเอียด" และ "หมวดหมู่" ให้ทันทีเมื่อกดที่หน้าแรก</small>
+      <small class="text-muted d-block mb-2">รายการโปรดจะเติม "รายละเอียด" ให้ทันทีเมื่อกดที่หน้าแรก</small>
       <div class="d-flex gap-2">
-        <input type="text" id="newFavName" class="form-control" placeholder="รายละเอียด (ไม่บังคับ)">
-        <select id="newFavCategory" class="form-select" style="max-width:40%;"></select>
+        <input type="text" id="newFavName" class="form-control" placeholder="รายละเอียด">
       </div>
       <button class="btn-pink" style="padding:10px;" onclick="addNewFavorite()">⭐ เพิ่มรายการโปรด</button>
       <div id="favoriteManageList" class="mt-2"></div>
@@ -282,7 +268,7 @@
 
     <div class="card card-custom">
       <h6 class="mb-2" style="color: var(--pink-dark);">💾 สำรอง / นำเข้าข้อมูล</h6>
-      <small class="text-muted d-block mb-2">ดาวน์โหลดข้อมูลทั้งหมด (ทุน ยอดขาย รายการ หมวดหมู่) เป็นไฟล์ .json เก็บไว้ หรือใช้ย้ายไปเครื่อง/เบราว์เซอร์อื่น</small>
+      <small class="text-muted d-block mb-2">ดาวน์โหลดข้อมูลทั้งหมด (ทุน ยอดขาย รายการ) เป็นไฟล์ .json เก็บไว้ หรือใช้ย้ายไปเครื่อง/เบราว์เซอร์อื่น</small>
       <div class="d-flex gap-2">
         <button class="btn-pink" style="flex:1; padding:10px 8px;" onclick="downloadBackup()">⬇️ ดาวน์โหลดไฟล์สำรอง</button>
         <button class="btn-pink" style="flex:1; padding:10px 8px;" onclick="pickBackupFile()">⬆️ นำเข้าไฟล์สำรอง</button>
@@ -352,7 +338,6 @@
       <div class="modal-body">
         <input type="hidden" id="editId">
         <input type="text" id="editName" class="form-control" placeholder="รายละเอียด">
-        <select id="editCategory" class="form-select"></select>
         <input type="number" id="editAmount" class="form-control" placeholder="จำนวนเงิน">
       </div>
       <div class="modal-footer">
@@ -367,18 +352,16 @@
   const STORAGE_KEY = 'omni-accounting-data';
   const MAIN_CATS = ["บิลเก่า", "บิลใหม่", "โอน"];
   const MAIN_CAT_ICONS = { "บิลเก่า": "📦", "บิลใหม่": "✨", "โอน": "💸" };
-  const DEFAULT_CATEGORIES = ["โอน", "LINE", "บิลเก่า", "บิลใหม่"];
   const DEFAULT_FAVORITES = [
-    { name: "บิลเก่า", category: "" },
-    { name: "บิลใหม่", category: "" },
-    { name: "โอน", category: "" },
-    { name: "LINE", category: "" }
+    { name: "บิลเก่า" },
+    { name: "บิลใหม่" },
+    { name: "โอน" },
+    { name: "LINE" }
   ];
 
   let state = {
     capital: 0, sales: 0, log: [],
-    categories: DEFAULT_CATEGORIES.slice(),
-    favorites: DEFAULT_FAVORITES.map(f => ({ ...f })),   // รายการโปรดที่ผู้ใช้เลือกเอง (ชื่อ + หมวดหมู่)
+    favorites: DEFAULT_FAVORITES.map(f => ({ ...f })),   // รายการโปรดที่ผู้ใช้เลือกเอง (ชื่อ)
     rounds: [],          // (ไม่ใช้แล้ว) เก็บข้อมูลรอบเก่าที่เคยบันทึกไว้ ไม่ลบทิ้ง
     cashCount: null      // เงินสดที่นับได้จริง (รอบปัจจุบัน)
   };
@@ -392,7 +375,6 @@
     await loadState();
     applyTheme();
     document.getElementById('loadOverlay').style.display = 'none';
-    refreshCategoryDropdowns();
     updateUI();
     syncCashInput();
     updateInstallCard();
@@ -421,12 +403,10 @@
     arr.forEach(f => {
       if (!f || typeof f !== 'object') return;
       const name = String(f.name == null ? '' : f.name).trim();
-      const category = String(f.category == null ? '' : f.category).trim();
-      if (!name && !category) return;
-      const key = name + '\u0000' + category;
-      if (seen.has(key)) return;
-      seen.add(key);
-      out.push({ name: name, category: category });
+      if (!name) return;
+      if (seen.has(name)) return;
+      seen.add(name);
+      out.push({ name: name });
     });
     return out;
   }
@@ -435,7 +415,6 @@
     state.capital = parseFloat(p.capital) || 0;
     state.sales = parseFloat(p.sales) || 0;
     state.log = Array.isArray(p.log) ? p.log : [];
-    state.categories = Array.isArray(p.categories) && p.categories.length ? p.categories : DEFAULT_CATEGORIES.slice();
     state.favorites = sanitizeFavorites(p.favorites) || DEFAULT_FAVORITES.map(f => ({ ...f }));
     state.rounds = Array.isArray(p.rounds) ? p.rounds : [];
     const cc = parseFloat(p.cashCount);
@@ -467,7 +446,7 @@
   function snapshot() {
     return JSON.stringify({
       capital: state.capital, sales: state.sales, log: state.log,
-      categories: state.categories, favorites: state.favorites, rounds: state.rounds, cashCount: state.cashCount, savedAt: Date.now()
+      favorites: state.favorites, rounds: state.rounds, cashCount: state.cashCount, savedAt: Date.now()
     });
   }
 
@@ -502,7 +481,6 @@
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({
         name: document.getElementById('userName').value,
-        category: document.getElementById('category').value,
         amount: document.getElementById('amount').value
       }));
     } catch (e) {}
@@ -513,10 +491,9 @@
       if (!d) return;
       document.getElementById('userName').value = d.name || '';
       document.getElementById('amount').value = d.amount || '';
-      if (d.category && state.categories.includes(d.category)) document.getElementById('category').value = d.category;
     } catch (e) {}
   }
-  ['userName', 'category', 'amount'].forEach(id => {
+  ['userName', 'amount'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', saveDraft);
     el.addEventListener('change', saveDraft);
@@ -532,11 +509,8 @@
     if (e.key !== STORAGE_KEY || !e.newValue) return;
     const p = parseSaved(e.newValue);
     if (!p) return;
-    const keepCat = document.getElementById('category').value;
     applySaved(p);
     applyTheme();
-    refreshCategoryDropdowns();
-    if (state.categories.includes(keepCat)) document.getElementById('category').value = keepCat;
     updateUI();
     syncCashInput();
     if (document.getElementById('tab-history').classList.contains('active')) loadHistory();
@@ -559,10 +533,6 @@
       else document.getElementById(nextId).focus();
     }
   }
-  function clearCategory() {
-    document.getElementById('category').value = '';
-    saveDraft();
-  }
   function clearName() {
     document.getElementById('userName').value = '';
     saveDraft();
@@ -577,15 +547,12 @@
     return state.log.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   }
   function targetOf(entry) {
-    const cleanCat = (entry.rawCategory || "").trim();
-    const cleanName = (entry.rawName || "").trim();
-    const targetName = cleanName || cleanCat;
-    const targetNote = (cleanName && cleanCat) ? cleanCat : "";
-    return { targetName, targetNote };
+    const targetName = (entry.rawName || "").trim();
+    return { targetName, targetNote: "" };
   }
   function displayOf(entry) {
-    const { targetName, targetNote } = targetOf(entry);
-    return targetName + (targetNote ? ` (${targetNote})` : '');
+    const { targetName } = targetOf(entry);
+    return targetName;
   }
 
   function updateUI() {
@@ -599,6 +566,7 @@
     updateCashResult();
     renderQuickChips();
     renderFavoriteChips();
+    renderFavoriteManageList();
     if (document.getElementById('tab-bill').classList.contains('active')) renderBillPage();
   }
 
@@ -984,21 +952,19 @@
     const combos = new Map();
     const names = new Map();
     entries.forEach(e => {
-      const name = (e.rawName || '').trim(), cat = (e.rawCategory || '').trim();
+      const name = (e.rawName || '').trim();
       if (name) names.set(name, (names.get(name) || 0) + 1);
-      if (!name && !cat) return;
-      if (cat && !state.categories.includes(cat)) return;
-      const key = name + '\u0000' + cat;
-      const o = combos.get(key) || { name: name, cat: cat, count: 0, last: 0 };
+      if (!name) return;
+      const o = combos.get(name) || { name: name, count: 0, last: 0 };
       o.count++; o.last = Math.max(o.last, e.ts || 0);
-      combos.set(key, o);
+      combos.set(name, o);
     });
     quickCombos = Array.from(combos.values()).filter(o => o.count >= 2)
       .sort((a, b) => b.count - a.count || b.last - a.last).slice(0, 8);
 
     document.getElementById('quickWrap').style.display = quickCombos.length ? '' : 'none';
     document.getElementById('quickChips').innerHTML = quickCombos.map((o, i) =>
-      '<button type="button" class="quick-chip" onclick="applyQuick(' + i + ')">' + esc(o.name ? o.name + (o.cat ? ' (' + o.cat + ')' : '') : o.cat) + '</button>'
+      '<button type="button" class="quick-chip" onclick="applyQuick(' + i + ')">' + esc(o.name) + '</button>'
     ).join('');
 
     document.getElementById('nameList').innerHTML = Array.from(names.entries())
@@ -1009,7 +975,6 @@
     const o = quickCombos[i];
     if (!o) return;
     document.getElementById('userName').value = o.name;
-    document.getElementById('category').value = o.cat;
     saveDraft();
     document.getElementById('amount').focus();
   }
@@ -1019,34 +984,30 @@
     document.getElementById('favWrap').style.display = state.favorites.length ? '' : 'none';
     document.getElementById('favChips').innerHTML = state.favorites.map((f, i) =>
       '<button type="button" class="fav-chip" onclick="applyFavorite(' + i + ')">⭐ ' +
-      esc(f.name ? f.name + (f.category ? ' (' + f.category + ')' : '') : f.category) + '</button>'
+      esc(f.name) + '</button>'
     ).join('');
   }
   function applyFavorite(i) {
     const f = state.favorites[i];
     if (!f) return;
     document.getElementById('userName').value = f.name || '';
-    if (f.category && state.categories.includes(f.category)) document.getElementById('category').value = f.category;
-    else document.getElementById('category').value = '';
     saveDraft();
     document.getElementById('amount').focus();
   }
   function renderFavoriteManageList() {
     document.getElementById('favoriteManageList').innerHTML = state.favorites.map((f, i) =>
-      '<div class="list-manage-item"><span>⭐ ' + esc(f.name ? f.name + (f.category ? ' (' + f.category + ')' : '') : f.category) +
+      '<div class="list-manage-item"><span>⭐ ' + esc(f.name) +
       '</span><button class="btn btn-sm text-danger" onclick="removeFavorite(' + i + ')">ลบ</button></div>'
     ).join('') || '<div class="small text-muted text-center">ยังไม่มีรายการโปรดค่ะ</div>';
   }
   async function addNewFavorite() {
     const name = (document.getElementById('newFavName').value || '').trim();
-    const category = document.getElementById('newFavCategory').value || '';
-    if (!name && !category) { Swal.fire({ icon: 'warning', title: 'พิมพ์รายละเอียดหรือเลือกหมวดหมู่ก่อนน้า ✨' }); return; }
-    const dup = state.favorites.some(f => f.name === name && f.category === category);
+    if (!name) { Swal.fire({ icon: 'warning', title: 'พิมพ์รายละเอียดก่อนน้า ✨' }); return; }
+    const dup = state.favorites.some(f => f.name === name);
     if (dup) { Swal.fire({ icon: 'error', title: 'มีรายการโปรดนี้อยู่แล้วค่ะ' }); return; }
     captureUndo();
-    state.favorites.push({ name: name, category: category });
+    state.favorites.push({ name: name });
     document.getElementById('newFavName').value = '';
-    document.getElementById('newFavCategory').value = '';
     renderFavoriteChips();
     renderFavoriteManageList();
     await persist();
@@ -1077,10 +1038,7 @@
     undoSnap = null;
     hideUndo();
     if (!p) return;
-    const keepCat = document.getElementById('category').value;
     applySaved(p);
-    refreshCategoryDropdowns();
-    if (state.categories.includes(keepCat)) document.getElementById('category').value = keepCat;
     syncCashInput();
     updateUI();
     loadHistory();
@@ -1099,7 +1057,7 @@
   function buildBackup() {
     return {
       app: 'omni-accounting', version: 1, exportedAt: new Date().toISOString(),
-      data: { capital: state.capital, sales: state.sales, log: state.log, categories: state.categories, favorites: state.favorites, cashCount: state.cashCount, rounds: state.rounds }
+      data: { capital: state.capital, sales: state.sales, log: state.log, favorites: state.favorites, cashCount: state.cashCount, rounds: state.rounds }
     };
   }
   function downloadBackup(prefix) {
@@ -1131,13 +1089,11 @@
       log.push({
         id: id,
         rawName: String(e.rawName == null ? '' : e.rawName),
-        rawCategory: String(e.rawCategory == null ? '' : e.rawCategory),
         amount: amt,
         ts: ts,
         time: typeof e.time === 'string' ? e.time : (ts ? new Date(ts).toLocaleString('th-TH', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' น.' : '')
       });
     });
-    const cats = Array.isArray(d.categories) ? Array.from(new Set(d.categories.map(c => String(c).trim()).filter(Boolean))) : [];
     const favs = sanitizeFavorites(d.favorites);
     const cc = parseFloat(d.cashCount);
     return {
@@ -1145,7 +1101,6 @@
       exportedAt: raw.exportedAt || null,
       data: {
         capital: num(d.capital), sales: num(d.sales), log: log,
-        categories: cats.length ? cats : DEFAULT_CATEGORIES.slice(),
         favorites: favs || DEFAULT_FAVORITES.map(f => ({ ...f })),
         cashCount: (d.cashCount === null || d.cashCount === undefined || isNaN(cc)) ? null : cc,
         rounds: Array.isArray(d.rounds) ? d.rounds : []
@@ -1179,7 +1134,6 @@
 
     captureUndo();
     applySaved(clean.data);
-    refreshCategoryDropdowns();
     syncCashInput();
     updateUI();
     loadHistory();
@@ -1225,7 +1179,6 @@
   // ---------- Add / edit entries ----------
   async function saveData() {
     let n = document.getElementById('userName').value;
-    let c = document.getElementById('category').value;
     let aStr = document.getElementById('amount').value;
     let a = parseFloat(aStr);
 
@@ -1239,7 +1192,6 @@
     state.log.push({
       id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
       rawName: (n || '').trim(),
-      rawCategory: (c || '').trim(),
       amount: a,
       ts: now.getTime(),
       time: now.toLocaleString('th-TH', { day:'2-digit', month:'short', hour: '2-digit', minute: '2-digit' }) + ' น.'
@@ -1303,46 +1255,8 @@
     showUndo(backedUp ? 'ล้างข้อมูลแล้ว · ดาวน์โหลดไฟล์สำรองให้แล้วค่ะ' : 'ล้างข้อมูลเรียบร้อยค่ะ ✨');
   }
 
-  // ---------- Categories ----------
-  function categoryOptionsHtml(includeNone) {
-    let html = includeNone ? '<option value="">-- ไม่ระบุหมวดหมู่ --</option>' : '';
-    html += state.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    return html;
-  }
-  function refreshCategoryDropdowns() {
-    document.getElementById('category').innerHTML = categoryOptionsHtml(true);
-    document.getElementById('editCategory').innerHTML = categoryOptionsHtml(true);
-    document.getElementById('newFavCategory').innerHTML = categoryOptionsHtml(true);
-    document.getElementById('filterCategory').innerHTML = '<option value="">-- ทุกหมวดหมู่ --</option>' + state.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    renderCategoryManageList();
-    renderFavoriteManageList();
-  }
-  function renderCategoryManageList() {
-    document.getElementById('categoryManageList').innerHTML = state.categories.map(c =>
-      `<div class="list-manage-item"><span>${esc(c)}</span><button class="btn btn-sm text-danger" data-cat="${esc(c)}" onclick="removeCategory(this.dataset.cat)">ลบ</button></div>`
-    ).join('');
-  }
-  async function addNewCategory() {
-    const v = (document.getElementById('newCategoryInput').value || '').trim();
-    if (!v) { Swal.fire({icon:'warning', title:'กรุณาใส่ชื่อหมวดหมู่'}); return; }
-    if (state.categories.includes(v)) { Swal.fire({icon:'error', title:'มีหมวดหมู่นี้อยู่แล้ว'}); return; }
-    captureUndo();
-    state.categories.push(v);
-    document.getElementById('newCategoryInput').value = '';
-    refreshCategoryDropdowns();
-    await persist();
-    showUndo('เพิ่มหมวดหมู่แล้วค่ะ');
-  }
-  async function removeCategory(name) {
-    captureUndo();
-    state.categories = state.categories.filter(c => c !== name);
-    refreshCategoryDropdowns();
-    await persist();
-    showUndo('ลบหมวดหมู่แล้วค่ะ');
-  }
-
   // ---------- History ----------
-  // ค้นหาแบบฉลาด: พิมพ์คำเดียวแล้วค้นได้ทั้ง รายละเอียด/หมวดหมู่/วันที่
+  // ค้นหาแบบฉลาด: พิมพ์คำเดียวแล้วค้นได้ทั้ง รายละเอียด/วันที่
   // หรือพิมพ์ช่วงตัวเลขแบบ "100-500" เพื่อกรองตามช่วงจำนวนเงิน
   function parseAmountRange(q) {
     const m = q.match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/);
@@ -1355,7 +1269,6 @@
   }
   function loadHistory() {
     const search = (document.getElementById('searchBox').value || '').trim().toLowerCase();
-    const cat = document.getElementById('filterCategory').value;
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
 
@@ -1368,11 +1281,10 @@
         list = list.filter(e => searchTextOf(e).includes(search));
       }
     }
-    if (cat) list = list.filter(e => e.rawCategory === cat);
     if (from) { const fromTs = new Date(from + 'T00:00:00').getTime(); list = list.filter(e => e.ts >= fromTs); }
     if (to) { const toTs = new Date(to + 'T23:59:59').getTime(); list = list.filter(e => e.ts <= toTs); }
 
-    renderHistory(list, !!(search || cat || from || to));
+    renderHistory(list, !!(search || from || to));
   }
   function renderHistory(list, filtered) {
     const el = document.getElementById('historyList');
@@ -1398,7 +1310,6 @@
     if (!item) return;
     document.getElementById('editId').value = item.id;
     document.getElementById('editName').value = item.rawName || '';
-    document.getElementById('editCategory').value = item.rawCategory || '';
     document.getElementById('editAmount').value = item.amount;
     editEntryModal.show();
   }
@@ -1410,7 +1321,6 @@
     if (isNaN(amt)) { Swal.fire({icon:'error', title:'จำนวนเงินไม่ถูกต้อง'}); return; }
     captureUndo();
     item.rawName = document.getElementById('editName').value;
-    item.rawCategory = document.getElementById('editCategory').value;
     item.amount = amt;
     editEntryModal.hide();
     updateUI(); loadHistory();
@@ -1437,8 +1347,8 @@
   // ---------- Export ----------
   function exportCsv() {
     if (state.log.length === 0) { Swal.fire({icon:'info', title:'ยังไม่มีรายการให้ export ค่ะ'}); return; }
-    const header = 'รายละเอียด,หมวดหมู่,จำนวนเงิน,เวลา\n';
-    const rows = state.log.map(e => `"${(e.rawName||'').replace(/"/g,'""')}","${(e.rawCategory||'').replace(/"/g,'""')}",${e.amount},"${e.time}"`).join('\n');
+    const header = 'รายละเอียด,จำนวนเงิน,เวลา\n';
+    const rows = state.log.map(e => `"${(e.rawName||'').replace(/"/g,'""')}",${e.amount},"${e.time}"`).join('\n');
     const csv = '\uFEFF' + header + rows;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
