@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#ff85a2">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Jod Jod">
+<meta name="apple-mobile-web-app-title" content="บัญชีสรุป">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -103,27 +103,6 @@
 
   #loadOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 0.95rem; color: var(--pink-dark); }
 
-  /* ---------- ค้นหาด่วน (ปุ่มลอยมุมบนหน้าแรก) ---------- */
-  .fab-search { position: fixed; top: 6px; right: calc(max(15px, (100vw - 420px) / 2) + 8px); height: 34px; min-width: 34px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; gap: 0; border: 1.5px solid var(--pink-line); border-radius: 17px; background: rgba(255,255,255,0.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: var(--pink-dark); box-shadow: 0 3px 10px rgba(240,98,146,0.22); z-index: 900; transition: transform .25s, opacity .25s, gap .2s, background .2s; }
-  .fab-search svg { width: 17px; height: 17px; flex: none; }
-  .fab-search .fab-label { max-width: 0; overflow: hidden; white-space: nowrap; font-size: 0.82rem; transition: max-width .25s; }
-  .fab-search:hover { background: #fff; gap: 6px; }
-  .fab-search:hover .fab-label { max-width: 110px; }
-  .fab-search.fab-hidden { transform: translateY(-52px); opacity: 0; pointer-events: none; }
-  #quickSearchModal .modal-content { border: none; border-radius: 20px; box-shadow: 0 16px 40px rgba(240,98,146,0.25); background: var(--card-bg); }
-  @media (min-width: 576px) { #quickSearchModal .modal-dialog { margin-top: 8vh; } }
-  #quickSearchInput { border-radius: 14px; border: 1.5px solid var(--pink-line); padding: 10px 14px; }
-  #quickSearchInput:focus { border-color: var(--pink-main); box-shadow: 0 0 0 3px rgba(255,133,162,0.2); }
-  .qs-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; margin-bottom: 4px; border-radius: 12px; cursor: pointer; transition: background .15s; }
-  .qs-item:hover, .qs-item:active, .qs-item.qs-first { background: var(--pink-soft); }
-  .qs-item .qs-info { flex: 1; min-width: 0; }
-  .qs-item .qs-info div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .qs-item .qs-amount { font-weight: 600; color: var(--pink-dark); background: #fff; border: 1px solid var(--pink-line); border-radius: 12px; padding: 1px 9px; white-space: nowrap; font-size: 0.9rem; }
-  .qs-item .qs-del { background: none; border: none; padding: 2px 4px; opacity: 0.6; }
-  .qs-item .qs-del:hover { opacity: 1; }
-  .qs-item mark { background: #ffd3e0; color: inherit; padding: 0 1px; border-radius: 3px; }
-  .qs-hint { font-size: 0.78rem; color: #b39a92; text-align: center; margin-top: 8px; }
-  .qs-hint kbd { background: var(--pink-soft); color: var(--pink-dark); border-radius: 5px; padding: 0 5px; font-size: 0.75rem; }
 </style>
 </head>
 <body>
@@ -134,10 +113,6 @@
 
   <!-- ========== TAB: หน้าแรก ========== -->
   <div id="tab-home" class="tab-page active">
-    <button type="button" id="fabSearch" class="fab-search" onclick="openQuickSearch()" title="ค้นหารายการ (Ctrl+K)" aria-label="ค้นหารายการ">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <span class="fab-label">ค้นหา · Ctrl+K</span>
-    </button>
     <div class="card card-custom">
       <div class="summary-grid">
         <div class="mini-box">
@@ -171,21 +146,15 @@
       <button onclick="openDeleteModal()" class="btn-undo-mini">↩️ ย้อนกลับ</button>
       <h6 class="mb-3 text-center" style="color: var(--pink-dark);">🌸 เพิ่มรายการใหม่ 🌸</h6>
 
-      <div id="quickWrap" class="quick-wrap" style="display:none;">
-        <div class="quick-label">⚡ รายการประจำ (กดเพื่อเติมชื่อ)</div>
-        <div id="quickChips" class="quick-chips"></div>
-      </div>
-
       <div id="favWrap" class="quick-wrap">
         <div class="quick-label">⭐ รายการโปรด (กดเพื่อเติมชื่อ)</div>
         <div id="favChips" class="quick-chips"></div>
       </div>
 
       <div class="d-flex gap-2" style="align-items:flex-start;">
-        <input type="text" id="userName" class="form-control" placeholder="รายละเอียด" list="nameList" autocomplete="off" onkeydown="handleEnter(event, 'amount')" style="flex:1;">
+        <input type="text" id="userName" class="form-control" placeholder="รายละเอียด" autocomplete="off" onkeydown="handleEnter(event, 'amount')" style="flex:1;">
         <button type="button" class="btn-cat-clear" onclick="clearName()" title="ล้างรายละเอียด">✕</button>
       </div>
-      <datalist id="nameList"></datalist>
       <input type="number" id="amount" class="form-control" placeholder="จำนวนเงิน" inputmode="decimal" onkeydown="handleEnter(event, 'save')">
 
       <button onclick="saveData()" class="btn-pink mb-3" id="saveBtn">บันทึกข้อมูล ✨</button>
@@ -325,23 +294,6 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
         <button type="button" class="btn btn-pink" style="width:auto; border-radius:10px;" onclick="executeDelete()">ตกลง</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: ค้นหาด่วน -->
-<div class="modal fade" id="quickSearchModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <input type="text" id="quickSearchInput" class="form-control" placeholder="🔎 พิมพ์ชื่อ หรือยอดเงิน (เช่น 250 หรือ 100-500)" autocomplete="off" oninput="renderQuickSearch()" onkeydown="quickSearchKey(event)">
-        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="ปิด"></button>
-      </div>
-      <div class="modal-body pt-2">
-        <div id="quickSearchSummary" class="small text-muted mb-2 px-1"></div>
-        <div id="quickSearchList"></div>
-        <div class="qs-hint d-none d-sm-block"><kbd>Enter</kbd> เปิดรายการแรก · <kbd>Esc</kbd> ปิด</div>
       </div>
     </div>
   </div>
@@ -581,7 +533,6 @@
     document.getElementById('netFinalText').innerText = net.toLocaleString() + " ฿";
 
     updateCashResult();
-    renderQuickChips();
     renderFavoriteChips();
     renderFavoriteManageList();
     if (document.getElementById('tab-bill').classList.contains('active')) renderBillPage();
@@ -947,40 +898,6 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
     toast('success', isMobile ? 'บันทึกไฟล์รูปบิลแล้วค่ะ (เช็กในโฟลเดอร์ดาวน์โหลด) 🖼️' : 'บันทึกรูปบิลแล้วค่ะ', 2200);
-  }
-
-  // ---------- ช่วยพิมพ์: รายการประจำ + ชื่อที่เคยใช้ ----------
-  let quickCombos = [];
-  function renderQuickChips() {
-    const entries = state.log;
-    const combos = new Map();
-    const names = new Map();
-    entries.forEach(e => {
-      const name = (e.rawName || '').trim();
-      if (name) names.set(name, (names.get(name) || 0) + 1);
-      if (!name) return;
-      const o = combos.get(name) || { name: name, count: 0, last: 0 };
-      o.count++; o.last = Math.max(o.last, e.ts || 0);
-      combos.set(name, o);
-    });
-    quickCombos = Array.from(combos.values()).filter(o => o.count >= 2)
-      .sort((a, b) => b.count - a.count || b.last - a.last).slice(0, 8);
-
-    document.getElementById('quickWrap').style.display = quickCombos.length ? '' : 'none';
-    document.getElementById('quickChips').innerHTML = quickCombos.map((o, i) =>
-      '<button type="button" class="quick-chip" onclick="applyQuick(' + i + ')">' + esc(o.name) + '</button>'
-    ).join('');
-
-    document.getElementById('nameList').innerHTML = Array.from(names.entries())
-      .sort((a, b) => b[1] - a[1]).slice(0, 50)
-      .map(kv => '<option value="' + esc(kv[0]) + '"></option>').join('');
-  }
-  function applyQuick(i) {
-    const o = quickCombos[i];
-    if (!o) return;
-    document.getElementById('userName').value = o.name;
-    saveDraft();
-    document.getElementById('amount').focus();
   }
 
   // ---------- รายการโปรด (ผู้ใช้เลือกเองว่าจะปักหมุดคำไหน) ----------
@@ -1361,79 +1278,6 @@
     await persist();
     showUndo('ลบรายการแล้วค่ะ');
   }
-
-  // ---------- ค้นหาด่วน (ปุ่ม 🔎 มุมบนหน้าแรก / Ctrl+K) ----------
-  const quickSearchModalEl = document.getElementById('quickSearchModal');
-  const quickSearchModal = new bootstrap.Modal(quickSearchModalEl);
-  const QS_MAX = 10;
-  let qsShown = [];
-  function openQuickSearch() { quickSearchModal.show(); }
-  quickSearchModalEl.addEventListener('shown.bs.modal', () => {
-    const inp = document.getElementById('quickSearchInput');
-    inp.focus(); inp.select(); renderQuickSearch();
-  });
-  function renderQuickSearch() {
-    const q = (document.getElementById('quickSearchInput').value || '').trim().toLowerCase();
-    const sumEl = document.getElementById('quickSearchSummary');
-    const el = document.getElementById('quickSearchList');
-    qsShown = [];
-    if (!q) {
-      sumEl.textContent = '';
-      el.innerHTML = '<p class="text-muted text-center my-3">พิมพ์ชื่อ หรือยอดเงินได้เลยค่ะ ✨</p>';
-      return;
-    }
-    const all = searchEntries(state.log.slice().reverse(), q);
-    qsShown = all.slice(0, QS_MAX);
-    if (all.length === 0) { sumEl.textContent = ''; el.innerHTML = '<p class="text-muted text-center my-3">ไม่พบรายการค่ะ</p>'; return; }
-    sumEl.textContent = all.length > QS_MAX ? 'พบ ' + all.length + ' รายการ · แสดง ' + QS_MAX + ' รายการล่าสุด (ดูทั้งหมดได้ที่แท็บประวัติ)' : 'พบ ' + all.length + ' รายการ';
-    const hlq = parseAmountRange(q) ? '' : q;
-    el.innerHTML = qsShown.map((item, i) => `
-      <div class="qs-item${i === 0 ? ' qs-first' : ''}" onclick="quickSearchGo('edit','${item.id}')">
-        <div class="qs-info">
-          <div>${qsHighlight(displayOf(item), hlq)}</div>
-          <small class="text-muted">${esc(item.time)}</small>
-        </div>
-        <div class="qs-amount">${(item.amount||0).toLocaleString()}฿</div>
-        <button type="button" class="qs-del" title="ลบ" onclick="event.stopPropagation(); quickSearchGo('delete','${item.id}')">🗑️</button>
-      </div>`).join('');
-  }
-  function qsHighlight(text, q) {
-    text = String(text || '');
-    if (!q) return esc(text);
-    const low = text.toLowerCase();
-    let out = '', pos = 0, i;
-    while ((i = low.indexOf(q, pos)) !== -1) {
-      out += esc(text.slice(pos, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>';
-      pos = i + q.length;
-    }
-    return out + esc(text.slice(pos));
-  }
-  // ซ่อนปุ่มค้นหาตอนเลื่อนลง แล้วโผล่กลับตอนเลื่อนขึ้น
-  (function () {
-    let lastY = window.scrollY;
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY, btn = document.getElementById('fabSearch');
-      if (!btn) return;
-      if (y > lastY + 6 && y > 80) btn.classList.add('fab-hidden');
-      else if (y < lastY - 6 || y <= 80) btn.classList.remove('fab-hidden');
-      lastY = y;
-    }, { passive: true });
-  })();
-  function quickSearchGo(action, id) {
-    quickSearchModalEl.addEventListener('hidden.bs.modal', () => {
-      if (action === 'edit') openEditEntry(id); else deleteEntryById(id);
-    }, { once: true });
-    quickSearchModal.hide();
-  }
-  function quickSearchKey(e) {
-    if (e.key === 'Enter' && qsShown.length) { e.preventDefault(); quickSearchGo('edit', qsShown[0].id); }
-  }
-  document.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      if (!document.body.classList.contains('modal-open') && !document.getElementById('loadOverlay')?.offsetParent) openQuickSearch();
-    }
-  });
 
   // ---------- Export ----------
   function exportCsv() {
