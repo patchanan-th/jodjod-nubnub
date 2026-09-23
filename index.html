@@ -124,6 +124,17 @@
   .undo-bar button { background: none; border: none; color: #ffb3c6; font-weight: 600; white-space: nowrap; padding: 2px 4px; }
 
   #loadOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 0.95rem; color: var(--pink-dark); }
+
+  /* ---------- ค้นหาด่วน (ปุ่มลอยมุมบนหน้าแรก) ---------- */
+  .fab-row { height: 40px; }
+  .fab-search { position: sticky; top: 8px; float: right; width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--pink-main); color: #fff; font-size: 1.15rem; line-height: 1; box-shadow: 0 4px 12px rgba(240,98,146,0.35); z-index: 900; transition: 0.2s; }
+  .fab-search:hover { background: var(--pink-dark); transform: scale(1.06); }
+  .qs-item { display: flex; align-items: center; gap: 8px; padding: 9px 4px; border-bottom: 1px solid var(--pink-soft); cursor: pointer; border-radius: 8px; }
+  .qs-item:hover, .qs-item:active { background: var(--pink-soft); }
+  .qs-item .qs-info { flex: 1; min-width: 0; }
+  .qs-item .qs-info div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .qs-item .qs-amount { font-weight: bold; color: var(--pink-dark); white-space: nowrap; }
+  .qs-item .qs-del { background: none; border: none; padding: 2px 4px; }
 </style>
 </head>
 <body>
@@ -134,6 +145,7 @@
 
   <!-- ========== TAB: หน้าแรก ========== -->
   <div id="tab-home" class="tab-page active">
+    <div class="fab-row"><button type="button" class="fab-search" onclick="openQuickSearch()" title="ค้นหารายการ (Ctrl+K)" aria-label="ค้นหารายการ">🔎</button></div>
     <div class="card card-custom">
       <div class="summary-grid">
         <div class="mini-box">
@@ -325,6 +337,22 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
         <button type="button" class="btn btn-pink" style="width:auto; border-radius:10px;" onclick="executeDelete()">ตกลง</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: ค้นหาด่วน -->
+<div class="modal fade" id="quickSearchModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <input type="text" id="quickSearchInput" class="form-control" placeholder="🔎 พิมพ์ชื่อ หรือยอดเงิน (เช่น 250 หรือ 100-500)" autocomplete="off" oninput="renderQuickSearch()" onkeydown="quickSearchKey(event)">
+        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <div id="quickSearchSummary" class="small text-muted mb-1"></div>
+        <div id="quickSearchList"></div>
       </div>
     </div>
   </div>
@@ -1272,20 +1300,20 @@
   function searchTextOf(e) {
     return (displayOf(e) + ' ' + (e.time || '') + ' ' + String(e.amount || '')).toLowerCase();
   }
+  function searchEntries(list, search) {
+    if (!search) return list;
+    const range = parseAmountRange(search);
+    if (range) {
+      return list.filter(e => { const amt = parseFloat(e.amount) || 0; return amt >= range[0] && amt <= range[1]; });
+    }
+    return list.filter(e => searchTextOf(e).includes(search));
+  }
   function loadHistory() {
     const search = (document.getElementById('searchBox').value || '').trim().toLowerCase();
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
 
-    let list = state.log.slice().reverse();
-    if (search) {
-      const range = parseAmountRange(search);
-      if (range) {
-        list = list.filter(e => { const amt = parseFloat(e.amount) || 0; return amt >= range[0] && amt <= range[1]; });
-      } else {
-        list = list.filter(e => searchTextOf(e).includes(search));
-      }
-    }
+    let list = searchEntries(state.log.slice().reverse(), search);
     if (from) { const fromTs = new Date(from + 'T00:00:00').getTime(); list = list.filter(e => e.ts >= fromTs); }
     if (to) { const toTs = new Date(to + 'T23:59:59').getTime(); list = list.filter(e => e.ts <= toTs); }
 
@@ -1348,6 +1376,56 @@
     await persist();
     showUndo('ลบรายการแล้วค่ะ');
   }
+
+  // ---------- ค้นหาด่วน (ปุ่ม 🔎 มุมบนหน้าแรก / Ctrl+K) ----------
+  const quickSearchModalEl = document.getElementById('quickSearchModal');
+  const quickSearchModal = new bootstrap.Modal(quickSearchModalEl);
+  const QS_MAX = 10;
+  let qsShown = [];
+  function openQuickSearch() { quickSearchModal.show(); }
+  quickSearchModalEl.addEventListener('shown.bs.modal', () => {
+    const inp = document.getElementById('quickSearchInput');
+    inp.focus(); inp.select(); renderQuickSearch();
+  });
+  function renderQuickSearch() {
+    const q = (document.getElementById('quickSearchInput').value || '').trim().toLowerCase();
+    const sumEl = document.getElementById('quickSearchSummary');
+    const el = document.getElementById('quickSearchList');
+    qsShown = [];
+    if (!q) {
+      sumEl.textContent = '';
+      el.innerHTML = '<p class="text-muted text-center my-3">พิมพ์ชื่อ หรือยอดเงินได้เลยค่ะ ✨</p>';
+      return;
+    }
+    const all = searchEntries(state.log.slice().reverse(), q);
+    qsShown = all.slice(0, QS_MAX);
+    if (all.length === 0) { sumEl.textContent = ''; el.innerHTML = '<p class="text-muted text-center my-3">ไม่พบรายการค่ะ</p>'; return; }
+    sumEl.textContent = all.length > QS_MAX ? 'พบ ' + all.length + ' รายการ · แสดง ' + QS_MAX + ' รายการล่าสุด (ดูทั้งหมดได้ที่แท็บประวัติ)' : 'พบ ' + all.length + ' รายการ';
+    el.innerHTML = qsShown.map(item => `
+      <div class="qs-item" onclick="quickSearchGo('edit','${item.id}')">
+        <div class="qs-info">
+          <div>${esc(displayOf(item))}</div>
+          <small class="text-muted">${esc(item.time)}</small>
+        </div>
+        <div class="qs-amount">${(item.amount||0).toLocaleString()}฿</div>
+        <button type="button" class="qs-del" title="ลบ" onclick="event.stopPropagation(); quickSearchGo('delete','${item.id}')">🗑️</button>
+      </div>`).join('');
+  }
+  function quickSearchGo(action, id) {
+    quickSearchModalEl.addEventListener('hidden.bs.modal', () => {
+      if (action === 'edit') openEditEntry(id); else deleteEntryById(id);
+    }, { once: true });
+    quickSearchModal.hide();
+  }
+  function quickSearchKey(e) {
+    if (e.key === 'Enter' && qsShown.length) { e.preventDefault(); quickSearchGo('edit', qsShown[0].id); }
+  }
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (!document.body.classList.contains('modal-open') && !document.getElementById('loadOverlay')?.offsetParent) openQuickSearch();
+    }
+  });
 
   // ---------- Export ----------
   function exportCsv() {
