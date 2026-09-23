@@ -889,9 +889,6 @@
   }
   async function saveBillImage() {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // เปิดแท็บเปล่าไว้ก่อนทันทีตอนกดปุ่ม (มือถือจะบล็อก popup ถ้าเปิดหลัง await)
-    let previewWin = null;
-    if (isMobile) { try { previewWin = window.open('', '_blank'); } catch (e) {} }
 
     try {
       if (document.fonts && document.fonts.load) {
@@ -902,75 +899,37 @@
     try { canvas = drawBillCanvas(buildBillModel()); }
     catch (e) {
       console.warn(e); toast('error', 'สร้างรูปไม่สำเร็จค่ะ');
-      if (previewWin) previewWin.close();
       return;
     }
 
     const fname = 'บิลรวม_' + new Date().toISOString().slice(0, 10) + '.png';
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    if (!blob) { toast('error', 'สร้างรูปไม่สำเร็จค่ะ'); return; }
 
     if (isMobile) {
-      // ลองใช้เมนูแชร์ของเครื่องก่อน (มีปุ่ม "บันทึกรูปภาพ" ให้ในตัว ไม่ต้องกดค้าง และไม่มีหน้าต่างค้าง)
+      // ลองใช้เมนูแชร์ของเครื่องก่อน (มีปุ่ม "บันทึกรูปภาพ" ให้ในตัว)
       try {
-        if (previewWin) previewWin.close();
-      } catch (e) {}
-      let shared = false;
-      try {
-        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-        if (blob && navigator.canShare) {
+        if (navigator.canShare) {
           const file = new File([blob], fname, { type: 'image/png' });
           if (navigator.canShare({ files: [file] })) {
             await navigator.share({ files: [file], title: 'บิลรวม' });
-            shared = true;
+            toast('success', 'บันทึกรูปบิลแล้วค่ะ 🖼️', 1500);
+            return;
           }
         }
       } catch (e) {
-        // ผู้ใช้กดยกเลิกการแชร์ หรืออุปกรณ์ไม่รองรับ → ไปใช้วิธีสำรองด้านล่าง
+        // ผู้ใช้กดยกเลิกการแชร์เอง → ไม่ต้องทำอะไรต่อ
         if (e && e.name === 'AbortError') { return; }
       }
-      if (shared) { toast('success', 'บันทึกรูปบิลแล้วค่ะ 🖼️', 1500); return; }
-
-      const dataUrl = canvas.toDataURL('image/png');
-      let fallbackWin = null;
-      try { fallbackWin = window.open('', '_blank'); } catch (e) {}
-      if (fallbackWin && !fallbackWin.closed) {
-        fallbackWin.document.open();
-        fallbackWin.document.write(
-          '<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">' +
-          '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' +
-          '<title>บิลรวม</title><style>' +
-          'body{margin:0;background:#1c1c1e;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:"Sarabun","Noto Sans Thai",sans-serif;box-sizing:border-box;padding:16px;}' +
-          'p{color:#fff;text-align:center;font-size:0.95rem;margin:0 0 14px;line-height:1.5;}' +
-          'img{max-width:100%;max-height:70vh;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}' +
-          'a{margin-top:16px;color:#ff85a2;font-size:0.9rem;text-decoration:underline;}' +
-          '.closeBtn{margin-top:18px;background:#ff85a2;color:#fff;border:none;border-radius:20px;padding:10px 28px;font-size:0.95rem;font-family:inherit;}' +
-          '</style></head><body>' +
-          '<p>📌 กดค้างที่รูปด้านล่าง แล้วเลือก <b>"บันทึกรูปภาพ"</b><br>เพื่อบันทึกเข้าคลังรูปในเครื่องได้เลยค่ะ</p>' +
-          '<img src="' + dataUrl + '" alt="บิลรวม">' +
-          '<a href="' + dataUrl + '" download="' + fname + '">📥 หรือกดที่นี่เพื่อดาวน์โหลดไฟล์แทน</a>' +
-          '<button class="closeBtn" onclick="window.close()">✖️ ปิดหน้านี้</button>' +
-          '</body></html>'
-        );
-        fallbackWin.document.close();
-      } else {
-        // popup ถูกบล็อก → สำรองด้วยการดาวน์โหลดไฟล์ตามปกติ
-        const a = document.createElement('a');
-        a.href = dataUrl; a.download = fname;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        toast('success', 'บันทึกรูปบิลแล้วค่ะ 🖼️', 1500);
-      }
-      return;
     }
 
-    // คอมพิวเตอร์: ดาวน์โหลดเป็นไฟล์ PNG ตามเดิม
-    canvas.toBlob(blob => {
-      if (!blob) { toast('error', 'สร้างรูปไม่สำเร็จค่ะ'); return; }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = fname;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-      toast('success', 'บันทึกรูปบิลแล้วค่ะ', 1500);
-    }, 'image/png');
+    // ไม่รองรับเมนูแชร์ (หรือเปิดจากคอมพิวเตอร์) → ดาวน์โหลดไฟล์ PNG ลงเครื่องโดยตรง ไม่มีขั้นตอนกดค้าง
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('success', isMobile ? 'บันทึกไฟล์รูปบิลแล้วค่ะ (เช็กในโฟลเดอร์ดาวน์โหลด) 🖼️' : 'บันทึกรูปบิลแล้วค่ะ', 2200);
   }
 
   // ---------- ช่วยพิมพ์: รายการประจำ + ชื่อที่เคยใช้ ----------
